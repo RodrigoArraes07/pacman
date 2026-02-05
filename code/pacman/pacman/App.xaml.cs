@@ -70,7 +70,8 @@ public partial class App : Application
                 .ConfigureServices((context, services) =>
                 {
                     // TODO: Register your services
-                    //services.AddSingleton<IMyService, MyService>();
+                    services.AddTransient<PacmanMenuViewModel>(); 
+                    services.AddTransient<GamePageViewModel>();
                 })
                 .UseNavigation(RegisterRoutes)
             );
@@ -87,7 +88,9 @@ public partial class App : Application
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-            new ViewMap<PacmanMenuPage, PacmanMenuViewModel>()
+            new ViewMap<PacmanMenuPage, PacmanMenuViewModel>(),
+            new ViewMap<GamePage, GamePageViewModel>()
         );
+        
     }
 }

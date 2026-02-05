@@ -2,14 +2,23 @@ namespace pacman.Presentation;
 
 public partial  class PacmanMenuViewModel : ObservableObject
 {
+    
+    private INavigator _navigator;
+    
+    public PacmanMenuViewModel(INavigator navigator)
+    {
+        _navigator = navigator;
+        StartGameCommand = new AsyncRelayCommand(StartGame);
+    }
+    
+    public ICommand StartGameCommand { get; }
+    
     [ObservableProperty]
     private bool isSoundEnabled = true;
-
-    [RelayCommand]
-    private void StartGame()
+    
+    private async Task StartGame()
     {
-        // Implementar lógica para iniciar o jogo
-        // Exemplo: NavigationService.Navigate(typeof(GamePage));
+        await _navigator.NavigateViewModelAsync<GamePageViewModel>(this);
     }
 
     [RelayCommand]

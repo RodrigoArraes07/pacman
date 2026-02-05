@@ -5,6 +5,9 @@
     xmlns:local="using:pacman.Presentation"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:uen="using:Uno.Extensions.Navigation.UI"
+    xmlns:utu="using:Uno.Toolkit.UI"
+    xmlns:um="using:Uno.Material"
     mc:Ignorable="d"
     Background="Black">
 
@@ -49,6 +52,7 @@
                 <StackPanel HorizontalAlignment="Center" Spacing="15" Margin="0,30,0,0">
                     <!-- Iniciar Jogo -->
                     <Button
+                        AutomationProperties.AutomationId="StartGameButton"
                         Command="{Binding StartGameCommand}"
                         Width="400"
                         Height="60"

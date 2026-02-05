@@ -23,6 +23,7 @@ public sealed partial class PacmanMenuPage : Page
     public PacmanMenuPage()
     {
         this.InitializeComponent();
+        Console.WriteLine(DataContext == null ? "❌ DataContext NULL" : $"✅ DataContext OK: {DataContext}");
     }
 }
 
