@@ -91,6 +91,11 @@ public partial class App : Application
             new ViewMap<PacmanMenuPage, PacmanMenuViewModel>(),
             new ViewMap<GamePage, GamePageViewModel>()
         );
-        
+
+        routes.Register(
+            new RouteMap("Menu", View: views.FindByViewModel<PacmanMenuViewModel>()),
+            new RouteMap("Game", View: views.FindByViewModel<GamePageViewModel>())
+            );
     }
 }
+
