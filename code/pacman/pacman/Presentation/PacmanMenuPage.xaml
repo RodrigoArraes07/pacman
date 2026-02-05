@@ -1,0 +1,187 @@
+﻿<Page
+    x:Class="pacman.Presentation.PacmanMenuPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:pacman.Presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*" />
+            <RowDefinition Height="100" />
+        </Grid.RowDefinitions>
+
+        <!-- Content Area -->
+        <Grid Grid.Row="0">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="40">
+                <!-- Logo of Pacman -->
+                <StackPanel HorizontalAlignment="Center" Spacing="15">
+                    <Grid>
+                        <TextBlock
+                            Text="PACMAN"
+                            FontSize="80"
+                            Foreground="#FFE34C"
+                            Opacity="0.3">
+                            <TextBlock.RenderTransform>
+                                <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                            </TextBlock.RenderTransform>
+                        </TextBlock>
+
+                        <!-- Texto principal (frente) -->
+                        <TextBlock
+                            Text="PACMAN"
+                            FontSize="80"
+                            Foreground="#FFE34C"/>
+                    </Grid>
+
+                    <!-- Loading bars decorativos -->
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="10">
+                        <Rectangle Width="80" Height="4" Fill="#3D5AFE" RadiusX="2" RadiusY="2"/>
+                        <Rectangle Width="40" Height="4" Fill="#3D5AFE" RadiusX="2" RadiusY="2"/>
+                        <Rectangle Width="80" Height="4" Fill="#3D5AFE" RadiusX="2" RadiusY="2"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- Menu Buttons -->
+                <StackPanel HorizontalAlignment="Center" Spacing="15" Margin="0,30,0,0">
+                    <!-- Iniciar Jogo -->
+                    <Button
+                        Command="{Binding StartGameCommand}"
+                        Width="400"
+                        Height="60"
+                        Background="#0A0A0A"
+                        BorderBrush="#3D5AFE"
+                        BorderThickness="3"
+                        CornerRadius="8">
+                        <TextBlock
+                            Text="INICIAR JOGO"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="#FFE34C" />
+                    </Button>
+
+                    <!-- Pontuações -->
+                    <Button
+                        Command="{Binding ShowHighScoresCommand}"
+                        Width="400"
+                        Height="60"
+                        Background="#0A0A0A"
+                        BorderBrush="#3D5AFE"
+                        BorderThickness="3"
+                        CornerRadius="8">
+                        <TextBlock
+                            Text="PONTUAÇÕES"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="#FFE34C" />
+                    </Button>
+
+                    <!-- Som -->
+                    <Button
+                        Command="{Binding ToggleSoundCommand}"
+                        Width="400"
+                        Height="60"
+                        Background="#0A0A0A"
+                        BorderBrush="#3D5AFE"
+                        BorderThickness="3"
+                        CornerRadius="8">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <FontIcon
+                                Glyph="{Binding IsSoundEnabled, Converter={StaticResource SoundIconConverter}}"
+                                FontSize="20"
+                                Foreground="#FFE34C"
+                                Margin="0,0,10,0"/>
+                            <TextBlock
+                                Text="SOM"
+                                FontSize="20"
+                                FontWeight="SemiBold"
+                                Foreground="#FFE34C" />
+                        </StackPanel>
+                    </Button>
+
+                    <!-- Sair -->
+                    <Button
+                        Command="{Binding ExitCommand}"
+                        Width="400"
+                        Height="60"
+                        Background="#0A0A0A"
+                        BorderBrush="#E53935"
+                        BorderThickness="3"
+                        CornerRadius="8"
+                        Margin="0,20,0,0">
+                        <TextBlock
+                            Text="SAIR"
+                            FontSize="20"
+                            FontWeight="SemiBold"
+                            Foreground="#E53935" />
+                    </Button>
+                </StackPanel>
+
+                <!-- Ghost Icons -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="20" Margin="0,30,0,0">
+                    <!-- Blinky (Vermelho) -->
+                    <Border Width="50" Height="50" Background="#FF0000" CornerRadius="25,25,0,0">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Pinky (Rosa) -->
+                    <Border Width="50" Height="50" Background="#FFB8FF" CornerRadius="25,25,0,0">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Inky (Ciano) -->
+                    <Border Width="50" Height="50" Background="#00FFFF" CornerRadius="25,25,0,0">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+
+                    <!-- Clyde (Laranja) -->
+                    <Border Width="50" Height="50" Background="#FFB851" CornerRadius="25,25,0,0">
+                        <Grid>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" VerticalAlignment="Center" Spacing="8">
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                                <Ellipse Width="12" Height="16" Fill="White"/>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+
+        <!-- Footer -->
+        <Grid Grid.Row="1">
+            <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
+                <TextBlock
+                    Text="© 2026 Jala University / UNO PLATFORM V1.0.4"
+                    FontSize="11"
+                    Foreground="#666666"
+                    HorizontalAlignment="Center" />
+
+                <!-- Indicator dots -->
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Spacing="8" Margin="0,5,0,0">
+                    <Ellipse Width="8" Height="8" Fill="#FFE34C"/>
+                    <Ellipse Width="8" Height="8" Fill="#666666"/>
+                    <Ellipse Width="8" Height="8" Fill="#666666"/>
+                </StackPanel>
+            </StackPanel>
+        </Grid>
+    </Grid>
+</Page>
+

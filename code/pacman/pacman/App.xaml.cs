@@ -81,25 +81,13 @@ public partial class App : Application
 #endif
         MainWindow.SetWindowIcon();
 
-        Host = await builder.NavigateAsync<Shell>();
+        Host = await builder.NavigateAsync<PacmanMenuPage>();
     }
 
     private static void RegisterRoutes(IViewRegistry views, IRouteRegistry routes)
     {
         views.Register(
-            new ViewMap(ViewModel: typeof(ShellViewModel)),
-            new ViewMap<MainPage, MainViewModel>(),
-            new DataViewMap<SecondPage, SecondViewModel, Entity>()
-        );
-
-        routes.Register(
-            new RouteMap("", View: views.FindByViewModel<ShellViewModel>(),
-                Nested:
-                [
-                    new("Main", View: views.FindByViewModel<MainViewModel>(), IsDefault: true),
-                    new("Second", View: views.FindByViewModel<SecondViewModel>()),
-                ]
-            )
+            new ViewMap<PacmanMenuPage, PacmanMenuViewModel>()
         );
     }
 }
