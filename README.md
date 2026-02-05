@@ -45,4 +45,6 @@ Once the first version of the system is available, it must be complemented with 
 
 Assim que a primeira versão do sistema estiver disponível, deverá complementar com as instruções de utilização. Descreva como instalar eventuais dependências e como executar a aplicação. -PORTUGUÊS-
 
+## Templates
+
 
