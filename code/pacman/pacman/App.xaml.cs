@@ -70,7 +70,8 @@ public partial class App : Application
                 .ConfigureServices((context, services) =>
                 {
                     // TODO: Register your services
-                    services.AddTransient<PacmanMenuViewModel>(); 
+                    services.AddSingleton<IScoreService, ScoreService>();
+                    services.AddTransient<PacmanMenuViewModel>();
                     services.AddTransient<GamePageViewModel>();
                 })
                 .UseNavigation(RegisterRoutes)
