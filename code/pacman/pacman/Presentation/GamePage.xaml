@@ -9,14 +9,44 @@
     Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
 
     <!-- Game Canvas -->
-    <Viewbox Grid.Row="1" Stretch="Uniform">
-        <Canvas
-            x:Name="GameCanvas"
-            Width="448"
-            Height="496"
-            Background="Black"
-            Loaded="GameCanvas_Loaded"
-            />
-    </Viewbox>
+    <Grid>
+        <Grid.RowDefinitions>
+            <!-- HUD: score, vidas, nível -->
+            <RowDefinition Height="Auto"/>
+            <!-- Área do jogo -->
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- HUD -->
+        <StackPanel Grid.Row="0" Orientation="Horizontal" Spacing="24"
+                    Padding="12,8" Background="#111">
+            <TextBlock Foreground="White" FontSize="14">
+                <Run Text="SCORE: "/>
+                <Run Text="{Binding Score}"/>
+            </TextBlock>
+            <TextBlock Foreground="White" FontSize="14">
+                <Run Text="LEVEL: "/>
+                <Run Text="{Binding Level}"/>
+            </TextBlock>
+            <TextBlock Foreground="Yellow" FontSize="14">
+                <Run Text="VIDAS: "/>
+                <Run Text="{Binding Lives.Count}"/>
+            </TextBlock>
+        </StackPanel>
+
+        <!-- Canvas do jogo centralizado -->
+        <Viewbox Grid.Row="1" Stretch="Uniform"
+                 HorizontalAlignment="Center"
+                 VerticalAlignment="Center">
+            <Canvas
+                x:Name="GameCanvas"
+                Width="448"
+                Height="496"
+                Background="Black"
+                IsTabStop="True"
+                KeyDown="GameCanvas_KeyDown"
+                />
+        </Viewbox>
+    </Grid>
 </Page>
 

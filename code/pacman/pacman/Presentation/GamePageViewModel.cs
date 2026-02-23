@@ -7,152 +7,153 @@ public partial class GamePageViewModel : ObservableObject
     [ObservableProperty] private int score = 0;
     [ObservableProperty] private int level = 1;
     [ObservableProperty] private ObservableCollection<int> lives = new ObservableCollection<int> { 1, 2, 3 };
-    [ObservableProperty] private int pacmanX = 13;
-    [ObservableProperty] private int pacmanY = 23;
-
-    private int directionX = 0;
-    private int directionY = 0;
-    private int totalDots = 0;
-    private int dotsEaten = 0;
     
-    public char[,] Maze { get; private set; }
+    // Posicao do pacman exposta para view
+    [ObservableProperty] private int pacmanX;
+    [ObservableProperty] private int pacmanY;
+    
+    // Importacao dos Models
+    public Arena Arena { get; }
+    public Pacman Pacman { get; }
+    public IReadOnlyList<Ghost> Ghosts { get; }
+    
+    // Exposicao do labirinto
+    public char[,] Maze => Arena.Maze;
+    
+    // ──────────────────────── Estado de Susto ──────────────────────────────────────
+    private int _frightenedTicksLeft = 0;
+    private const int FrightenedDuration = 30; // ticks
 
     public GamePageViewModel()
     {
-        InitializeMaze();
-        CountDots();
-    }
-    
-    private void InitializeMaze()
-    {
-        string[] mazeLayout = new string[]
+        Arena = new Arena();
+        Pacman = new Pacman();
+        Ghosts = new List<Ghost>
         {
-            "############################",
-            "#............##............#",
-            "#.####.#####.##.#####.####.#",
-            "#*####.#####.##.#####.####*#",
-            "#.####.#####.##.#####.####.#",
-            "#..........................#",
-            "#.####.##.########.##.####.#",
-            "#.####.##.########.##.####.#",
-            "#......##....##....##......#",
-            "######.##### ## #####.######",
-            "     #.##### ## #####.#     ",
-            "     #.##          ##.#     ",
-            "     #.## ###--### ##.#     ",
-            "######.## #      # ##.######",
-            "      .   #      #   .      ",
-            "######.## #      # ##.######",
-            "     #.## ######## ##.#     ",
-            "     #.##          ##.#     ",
-            "     #.## ######## ##.#     ",
-            "######.## ######## ##.######",
-            "#............##............#",
-            "#.####.#####.##.#####.####.#",
-            "#.####.#####.##.#####.####.#",
-            "#*..##................##..*#",
-            "###.##.##.########.##.##.###",
-            "###.##.##.########.##.##.###",
-            "#......##....##....##......#",
-            "#.##########.##.##########.#",
-            "#.##########.##.##########.#",
-            "#..........................#",
-            "############################"
+            new Ghost(GhostPersonality.Blinky),
+            new Ghost(GhostPersonality.Blinky)
         };
-
-        Maze = new char[mazeLayout.Length, mazeLayout[0].Length];
-
-        for (int row = 0; row < mazeLayout.Length; row++)
-        {
-            for (int col = 0; col < mazeLayout[row].Length; col++)
-            {
-                Maze[row, col] = mazeLayout[row][col];
-            }
-        }
+        
+        SyncPacmanPosition();
+        
     }
     
-    private void CountDots()
+    // ────────────────────── Input ─────────────────────────
+    /// <summary>Repassa a direção desejada ao modelo do pacman.</summary>
+    public void SetDirection(int dx, int dy) => Pacman.SetDirection(dx, dy);
+    
+    // ── Tick principal ───────────────────────────────────────────────────────
+    /// <summary>
+    /// Processa a logica de movimentacao do jogo: move Pac-Man, come pontos, move fantasmas,
+    /// verifica colisões.
+    /// </summary>
+
+    public TickResult ProcessTick()
     {
-        totalDots = 0;
-        for (int row = 0; row < Maze.GetLength(0); row++)
+        // 1) Mover Pac-Man
+        bool moved = Pacman.Move(Arena);
+        if (moved)
         {
-            for (int col = 0; col < Maze.GetLength(1); col++)
+            SyncPacmanPosition();
+
+            // 2) Comer ponto
+            int earned = Arena.EatDot(Pacman.Col, Pacman.Row);
+            if (earned > 0)
             {
-                if (Maze[row, col] == '.' || Maze[row, col] == '*')
+                Score += earned;
+
+                // Power pellet: assustar fantasmas
+                if (earned == 50)
                 {
-                    totalDots++;
+                    _frightenedTicksLeft = FrightenedDuration;
+                    foreach (var g in Ghosts)
+                        g.SetFrightened();
                 }
             }
         }
-    }
 
-    public void SetDirection(int dx, int dy)
-    {
-        directionX = dx;
-        directionY = dy;
-    }
-    
-    public bool MovePacman()
-    {
-        if (directionX == 0 && directionY == 0)
-            return false;
-        
-        int newX = PacmanX + directionX;
-        int newY = PacmanY + directionY;
-        
-        //TRATAMENTO DAS EXCECOES E LIMITACOES DE MOVIMENTO DO PACMAN
-        // Verificar limites na array
-        if (newY < 0 || newY >= Maze.GetLength(0) || 
-            newX < 0 || newX >= Maze.GetLength(1))
-            return false;
-
-        // Verificar colisão
-        char cell = Maze[newY, newX];
-        if (cell == '#' || cell == '-')
-            return false;
-
-        // Mover Pacman
-        PacmanX = newX;
-        PacmanY = newY;
-        return true;
-    }
-    
-    public void EatDot()
-    {
-        char cell = Maze[PacmanY, PacmanX];
-            
-        if (cell == '.')
+        // 3) Tick do estado frightened
+        if (_frightenedTicksLeft > 0)
         {
-            Score += 10;
-            dotsEaten++;
-            Maze[PacmanY, PacmanX] = ' ';
+            _frightenedTicksLeft--;
+            if (_frightenedTicksLeft == 0)
+                foreach (var g in Ghosts)
+                    if (g.State == GhostState.Frightened)
+                        g.SetChasing();
         }
-        else if (cell == '*')
+
+        // 4) Mover fantasmas
+        foreach (var ghost in Ghosts)
+            ghost.Move(Arena, Pacman.Col, Pacman.Row);
+
+        // 5) Verificar colisão Pac-Man × Fantasmas
+        foreach (var ghost in Ghosts)
         {
-            Score += 50;
-            dotsEaten++;
-            Maze[PacmanY, PacmanX] = ' ';
+            if (!ghost.IsAt(Pacman.Col, Pacman.Row)) continue;
+
+            if (ghost.State == GhostState.Frightened)
+            {
+                // Pac-Man comeu o fantasma
+                Score += 200;
+                ghost.SetReturning();
+            }
+            else if (ghost.State == GhostState.Chasing)
+            {
+                // Pac-Man morreu
+                return TickResult.PacmanDied;
+            }
         }
+
+        // 6) Verificar vitória
+        if (Arena.IsCleared())
+            return TickResult.LevelCleared;
+
+        return TickResult.Normal;
     }
     
-    public bool CheckWin()
-    {
-        return dotsEaten >= totalDots;
-    }
-    
+    // ────────────────────── Fim de vida ────────────────────────────
     public void LoseLife()
     {
         if (Lives.Count > 0)
-        {
             Lives.RemoveAt(Lives.Count - 1);
-        }
+    }
+    
+    public bool IsGameOver() => Lives.Count == 0;
+    
+    /// <summary>Reposiciona Pac-Man e fantasmas sem reiniciar o labirinto.</summary>
+    public void ResetPositions()
+    {
+        Pacman.Reset();
+        foreach (var g in Ghosts) g.Reset();
+        _frightenedTicksLeft = 0;
+        SyncPacmanPosition();
     }
 
-    public void ResetPosition()
+    /// <summary>Reinicia o jogo completo (labirinto + posições + score).</summary>
+    public void FullReset()
     {
-        PacmanX = 13;
-        PacmanY = 23;
-        directionX = 0;
-        directionY = 0;
+        Arena.Reset();
+        Pacman.Reset();
+        foreach (var g in Ghosts) g.Reset();
+        Score = 0;
+        Level = 1;
+        Lives = new ObservableCollection<int> { 1, 2, 3 };
+        _frightenedTicksLeft = 0;
+        SyncPacmanPosition();
     }
+    
+    // ──────────────────────── Helpers ─────────────────────────────
+    private void SyncPacmanPosition()
+    {
+        PacmanX = Pacman.Col;
+        PacmanY = Pacman.Row;
+    }
+}
+
+/// <summary>Resultado de um tick do jogo.</summary>
+public enum TickResult
+{
+    Normal,
+    PacmanDied,
+    LevelCleared
 }
