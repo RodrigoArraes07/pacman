@@ -9,6 +9,7 @@ pacman/.idea/
 pacman/.github/
 pacman/.vscode/
 pacman/.run/
+pacman/.claude/
 
 # Common node modules locations
 /node_modules

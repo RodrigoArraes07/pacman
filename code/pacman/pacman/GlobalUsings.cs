@@ -6,6 +6,7 @@ global using Microsoft.Extensions.Logging;
 global using Microsoft.Extensions.Options;
 global using pacman.Models;
 global using pacman.Presentation;
+global using pacman.Services;
 global using pacman.Services.Endpoints;
 global using Uno.Extensions.Http.Kiota;
 global using ApplicationExecutionState = Windows.ApplicationModel.Activation.ApplicationExecutionState;
