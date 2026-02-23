@@ -15,6 +15,7 @@ using Microsoft.UI.Xaml.Controls.Primitives;
 using Microsoft.UI.Xaml.Data;
 using Microsoft.UI.Xaml.Input;
 using Microsoft.UI.Xaml.Media;
+using Microsoft.UI.Xaml.Media.Imaging;
 using Microsoft.UI.Xaml.Navigation;
 using Microsoft.UI.Xaml.Shapes;
 using Rectangle = Microsoft.UI.Xaml.Shapes.Rectangle;
@@ -33,7 +34,8 @@ public sealed partial class GamePage : Page
     // ─────────────────────── Elementos visuais ────────────────────────────────────────────────────
     private readonly Dictionary<string, Rectangle> _wallRects   = new();
     private readonly Dictionary<string, Ellipse>   _dotEllipses = new();
-    private Ellipse _pacmanEllipse;
+    private Image _pacmanImage;
+    private BitmapImage _pacmanBitmap;
 
     // Um ellipse por fantasma, indexado por personalidade
     private readonly Dictionary<GhostPersonality, Ellipse> _ghostEllipses = new();
@@ -65,7 +67,7 @@ public sealed partial class GamePage : Page
                 _wallRects.Clear();
                 _dotEllipses.Clear();
                 _ghostEllipses.Clear();
-                _pacmanEllipse = null;
+                _pacmanImage = null;
             
                 DrawMaze();
                 DrawPacman();
@@ -246,20 +248,24 @@ public sealed partial class GamePage : Page
     // ── Desenho e atualização do Pac-Man ─────────────────────────────────────
     private void DrawPacman()
     {
-        if (_pacmanEllipse == null)
+        _pacmanBitmap ??= new BitmapImage(new Uri("ms-appx:///Assets/Sprites/pacman/pacman.png"));
+
+        if (_pacmanImage == null)
         {
-            _pacmanEllipse = new Ellipse
+            _pacmanImage = new Image
             {
                 Width  = CellSize - 2,
                 Height = CellSize - 2,
-                Fill   = new SolidColorBrush(
-                    Microsoft.UI.ColorHelper.FromArgb(255, 255, 227, 76))
+                Source = _pacmanBitmap,
+                RenderTransformOrigin = new Windows.Foundation.Point(0.5, 0.5),
+                RenderTransform = new RotateTransform()
             };
-            GameCanvas.Children.Add(_pacmanEllipse);
+            GameCanvas.Children.Add(_pacmanImage);
         }
 
-        Canvas.SetLeft(_pacmanEllipse, ViewModel.PacmanX * CellSize + 1);
-        Canvas.SetTop(_pacmanEllipse,  ViewModel.PacmanY * CellSize + 1);
+        ((RotateTransform)_pacmanImage.RenderTransform).Angle = ViewModel.Pacman.GetRotationAngle() + 180;
+        Canvas.SetLeft(_pacmanImage, ViewModel.PacmanX * CellSize + 1);
+        Canvas.SetTop(_pacmanImage,  ViewModel.PacmanY * CellSize + 1);
     }
 
     // ── Desenho e atualização dos fantasmas ──────────────────────────────────
