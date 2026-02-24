@@ -37,12 +37,18 @@ public sealed partial class GamePage : Page
     private Image _pacmanImage;
     private BitmapImage _pacmanBitmap;
 
-    // Um ellipse por fantasma, indexado por personalidade
-    private readonly Dictionary<GhostPersonality, Ellipse> _ghostEllipses = new();
+    // Um Image por fantasma, indexado por personalidade
+    private readonly Dictionary<GhostPersonality, Image>        _ghostImages  = new();
+    private readonly Dictionary<GhostPersonality, BitmapImage>  _ghostBitmaps = new();
+    private BitmapImage _frightenedBitmap;
 
-    // ── Cores dos fantasmas assustados ───────────────────────────────────────
-    private static readonly Windows.UI.Color FrightenedColor =
-        Microsoft.UI.ColorHelper.FromArgb(255, 0, 0, 255); // azul
+    private static readonly Dictionary<GhostPersonality, string> GhostSpritePaths = new()
+    {
+        { GhostPersonality.Blinky, "ms-appx:///Assets/Sprites/ghosts/red_ghost.png"    },
+        { GhostPersonality.Pinky,  "ms-appx:///Assets/Sprites/ghosts/pink_ghost.png"   },
+        { GhostPersonality.Inky,   "ms-appx:///Assets/Sprites/ghosts/blue_ghost.png"   },
+        { GhostPersonality.Clyde,  "ms-appx:///Assets/Sprites/ghosts/yellow_ghost.png" },
+    };
 
     // ────────────────────────────────── Construtor ─────────────────────────────────────
     public GamePage()
@@ -66,7 +72,7 @@ public sealed partial class GamePage : Page
                 GameCanvas.Children.Clear();
                 _wallRects.Clear();
                 _dotEllipses.Clear();
-                _ghostEllipses.Clear();
+                _ghostImages.Clear();
                 _pacmanImage = null;
             
                 DrawMaze();
@@ -271,20 +277,24 @@ public sealed partial class GamePage : Page
     // ── Desenho e atualização dos fantasmas ──────────────────────────────────
     private void DrawGhosts()
     {
+        _frightenedBitmap ??= new BitmapImage(new Uri("ms-appx:///Assets/Sprites/ghosts/frightened.png"));
+
         foreach (var ghost in ViewModel.Ghosts)
         {
-            if (!_ghostEllipses.ContainsKey(ghost.Personality))
+            if (!_ghostBitmaps.ContainsKey(ghost.Personality))
+                _ghostBitmaps[ghost.Personality] = new BitmapImage(
+                    new Uri(GhostSpritePaths[ghost.Personality]));
+
+            if (!_ghostImages.ContainsKey(ghost.Personality))
             {
-                var (r, g, b) = ghost.BaseColor;
-                var ellipse = new Ellipse
+                var img = new Image
                 {
                     Width  = CellSize - 2,
                     Height = CellSize - 2,
-                    Fill   = new SolidColorBrush(
-                        Microsoft.UI.ColorHelper.FromArgb(255, r, g, b))
+                    Source = _ghostBitmaps[ghost.Personality]
                 };
-                GameCanvas.Children.Add(ellipse);
-                _ghostEllipses[ghost.Personality] = ellipse;
+                GameCanvas.Children.Add(img);
+                _ghostImages[ghost.Personality] = img;
             }
 
             UpdateGhostVisual(ghost);
@@ -293,23 +303,14 @@ public sealed partial class GamePage : Page
 
     private void UpdateGhostVisual(Ghost ghost)
     {
-        if (!_ghostEllipses.TryGetValue(ghost.Personality, out var ellipse)) return;
+        if (!_ghostImages.TryGetValue(ghost.Personality, out var img)) return;
 
-        // Cor: azul quando assustado
-        Windows.UI.Color color;
-        if (ghost.State == GhostState.Frightened)
-        {
-            color = FrightenedColor;
-        }
-        else
-        {
-            var (r, g, b) = ghost.BaseColor;
-            color = Microsoft.UI.ColorHelper.FromArgb(255, r, g, b);
-        }
+        img.Source = ghost.State == GhostState.Frightened
+            ? _frightenedBitmap
+            : _ghostBitmaps[ghost.Personality];
 
-        ellipse.Fill = new SolidColorBrush(color);
-        Canvas.SetLeft(ellipse, ghost.Col * CellSize + 1);
-        Canvas.SetTop(ellipse,  ghost.Row * CellSize + 1);
+        Canvas.SetLeft(img, ghost.Col * CellSize + 1);
+        Canvas.SetTop(img,  ghost.Row * CellSize + 1);
     }
 
     // ──────────────────── Tick do jogo ──────────────────────────────

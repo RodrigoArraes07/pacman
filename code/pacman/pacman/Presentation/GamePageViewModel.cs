@@ -31,7 +31,9 @@ public partial class GamePageViewModel : ObservableObject
         Ghosts = new List<Ghost>
         {
             new Ghost(GhostPersonality.Blinky),
-            new Ghost(GhostPersonality.Blinky)
+            new Ghost(GhostPersonality.Pinky),
+            new Ghost(GhostPersonality.Inky),
+            new Ghost(GhostPersonality.Clyde)
         };
         
         SyncPacmanPosition();
