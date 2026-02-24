@@ -301,6 +301,10 @@ public sealed partial class GamePage : Page
     // ── Diálogos ─────────────────────────────────────────────────────────────
     private async Task ShowWinDialog()
     {
+        var playerName = await ShowPlayerNameDialogAsync("VOCÊ VENCEU!");
+        if (playerName != null)
+            await ViewModel.SaveScoreAsync(playerName);
+
         var dialog = new ContentDialog
         {
             Title           = "VOCÊ VENCEU! 🎉",
@@ -313,6 +317,10 @@ public sealed partial class GamePage : Page
 
     private async Task ShowGameOverDialog()
     {
+        var playerName = await ShowPlayerNameDialogAsync("GAME OVER");
+        if (playerName != null)
+            await ViewModel.SaveScoreAsync(playerName);
+
         var dialog = new ContentDialog
         {
             Title           = "GAME OVER",
@@ -321,5 +329,30 @@ public sealed partial class GamePage : Page
             XamlRoot        = this.XamlRoot
         };
         await dialog.ShowAsync();
+    }
+
+    // Retorna o nome digitado, ou null se o jogador pulou.
+    private async Task<string?> ShowPlayerNameDialogAsync(string context)
+    {
+        if (ViewModel.Score <= 0) return null;
+
+        var nameBox = new TextBox
+        {
+            PlaceholderText = "Digite seu nome (máx. 10 caracteres)",
+            MaxLength       = 10,
+            Text            = "AAA"
+        };
+
+        var dialog = new ContentDialog
+        {
+            Title             = $"{context} — Pontuação: {ViewModel.Score}",
+            Content           = nameBox,
+            PrimaryButtonText = "SALVAR",
+            CloseButtonText   = "PULAR",
+            XamlRoot          = this.XamlRoot
+        };
+
+        var result = await dialog.ShowAsync();
+        return result == ContentDialogResult.Primary ? nameBox.Text : null;
     }
 }

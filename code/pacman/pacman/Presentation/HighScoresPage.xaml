@@ -1,0 +1,221 @@
+<Page
+    x:Class="pacman.Presentation.HighScoresPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:pacman.Presentation"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Background="Black">
+
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <!-- Header -->
+        <Grid Grid.Row="0" Padding="16,12" Background="#111111">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+            <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
+                <Rectangle Width="14" Height="14" Fill="#FFE34C" />
+                <TextBlock
+                    Text="PACMAN ARCADE"
+                    Foreground="#FFE34C"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    VerticalAlignment="Center" />
+            </StackPanel>
+            <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="16" VerticalAlignment="Center">
+                <TextBlock Text="&#x2699;" FontSize="18" Foreground="#888888" />
+                <TextBlock Text="&#x1F50A;" FontSize="16" Foreground="#888888" />
+            </StackPanel>
+        </Grid>
+
+        <!-- Content -->
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel
+                Padding="40,30,40,20"
+                HorizontalAlignment="Center"
+                MaxWidth="600">
+
+                <!-- Title -->
+                <StackPanel HorizontalAlignment="Center" Spacing="8" Margin="0,0,0,30">
+                    <TextBlock
+                        Text="HIGH SCORES"
+                        FontSize="48"
+                        FontWeight="Bold"
+                        Foreground="#FFE34C"
+                        HorizontalAlignment="Center"
+                        CharacterSpacing="200" />
+                    <Rectangle Height="3" Fill="#00FFFF" Width="180" HorizontalAlignment="Center" />
+                </StackPanel>
+
+                <!-- Table Container -->
+                <Border
+                    Background="#0D0D0D"
+                    BorderBrush="#1E1E1E"
+                    BorderThickness="1"
+                    CornerRadius="4">
+                    <StackPanel>
+
+                        <!-- Table Header -->
+                        <Grid Padding="20,14,20,14">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="80" />
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="120" />
+                            </Grid.ColumnDefinitions>
+                            <TextBlock
+                                Text="RANK"
+                                Foreground="#00FFFF"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                CharacterSpacing="150" />
+                            <TextBlock
+                                Grid.Column="1"
+                                Text="PLAYER"
+                                Foreground="#00FFFF"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                CharacterSpacing="150" />
+                            <TextBlock
+                                Grid.Column="2"
+                                Text="SCORE"
+                                Foreground="#00FFFF"
+                                FontSize="12"
+                                FontWeight="SemiBold"
+                                CharacterSpacing="150"
+                                HorizontalAlignment="Right" />
+                        </Grid>
+
+                        <Rectangle Height="1" Fill="#2A2A2A" />
+
+                        <!-- Empty State -->
+                        <TextBlock
+                            Text="Nenhuma pontuação registrada ainda."
+                            Foreground="#555555"
+                            FontSize="14"
+                            HorizontalAlignment="Center"
+                            Padding="0,24"
+                            Visibility="{Binding EmptyVisibility}" />
+
+                        <!-- Top 3 Scores (highlighted) -->
+                        <ItemsControl ItemsSource="{Binding TopThree}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="20,12,20,12">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Text="{Binding RankLabel}"
+                                            Foreground="#FFE34C"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            VerticalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="{Binding PlayerName}"
+                                            Foreground="#FFE34C"
+                                            FontSize="16"
+                                            FontWeight="SemiBold"
+                                            VerticalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding ScoreLabel}"
+                                            Foreground="#FFE34C"
+                                            FontSize="16"
+                                            FontWeight="Bold"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <!-- Scores 4–10 (normal) -->
+                        <ItemsControl ItemsSource="{Binding OtherScores}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid Padding="20,10,20,10">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="80" />
+                                            <ColumnDefinition Width="*" />
+                                            <ColumnDefinition Width="120" />
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock
+                                            Text="{Binding RankLabel}"
+                                            Foreground="#888888"
+                                            FontSize="14"
+                                            VerticalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            Text="{Binding PlayerName}"
+                                            Foreground="#AAAAAA"
+                                            FontSize="14"
+                                            VerticalAlignment="Center" />
+                                        <TextBlock
+                                            Grid.Column="2"
+                                            Text="{Binding ScoreLabel}"
+                                            Foreground="#AAAAAA"
+                                            FontSize="14"
+                                            HorizontalAlignment="Right"
+                                            VerticalAlignment="Center" />
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Rectangle Height="1" Fill="#2A2A2A" Margin="0,4,0,0" />
+
+                        <!-- Status Bar -->
+                        <Grid Padding="20,10">
+                            <TextBlock
+                                Text="HARDWARE SYNC STATUS"
+                                Foreground="#444444"
+                                FontSize="11"
+                                CharacterSpacing="100"
+                                VerticalAlignment="Center" />
+                            <TextBlock
+                                Text="ONLINE"
+                                Foreground="#00CC44"
+                                FontSize="11"
+                                FontWeight="SemiBold"
+                                HorizontalAlignment="Right"
+                                VerticalAlignment="Center" />
+                        </Grid>
+
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Grid Grid.Row="2" Padding="0,20,0,24">
+            <Button
+                Command="{Binding GoBackCommand}"
+                HorizontalAlignment="Center"
+                Width="220"
+                Height="54"
+                Background="#FFE34C"
+                BorderThickness="0"
+                CornerRadius="27">
+                <TextBlock
+                    Text="VOLTAR"
+                    FontSize="18"
+                    FontWeight="Bold"
+                    Foreground="#000000"
+                    CharacterSpacing="150" />
+            </Button>
+        </Grid>
+
+    </Grid>
+</Page>

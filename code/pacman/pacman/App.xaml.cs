@@ -74,6 +74,7 @@ public partial class App : Application
                     services.AddSingleton<IAudioService, AudioService>();
                     services.AddTransient<PacmanMenuViewModel>();
                     services.AddTransient<GamePageViewModel>();
+                    services.AddTransient<HighScoresViewModel>();
                 })
                 .UseNavigation(RegisterRoutes)
             );
@@ -91,12 +92,14 @@ public partial class App : Application
     {
         views.Register(
             new ViewMap<PacmanMenuPage, PacmanMenuViewModel>(),
-            new ViewMap<GamePage, GamePageViewModel>()
+            new ViewMap<GamePage, GamePageViewModel>(),
+            new ViewMap<HighScoresPage, HighScoresViewModel>()
         );
 
         routes.Register(
             new RouteMap("Menu", View: views.FindByViewModel<PacmanMenuViewModel>()),
-            new RouteMap("Game", View: views.FindByViewModel<GamePageViewModel>())
+            new RouteMap("Game", View: views.FindByViewModel<GamePageViewModel>()),
+            new RouteMap("HighScores", View: views.FindByViewModel<HighScoresViewModel>())
             );
     }
 }
