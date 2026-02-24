@@ -24,18 +24,23 @@ public partial class GamePageViewModel : ObservableObject
     private int _frightenedTicksLeft = 0;
     private const int FrightenedDuration = 30; // ticks
 
-    public GamePageViewModel()
+    public IAudioService Audio { get; }
+    public bool IsFrightenedWarning => _frightenedTicksLeft is > 0 and <= 10;
+
+    public GamePageViewModel(IAudioService audio)
     {
+        Audio = audio;
         Arena = new Arena();
         Pacman = new Pacman();
         Ghosts = new List<Ghost>
         {
             new Ghost(GhostPersonality.Blinky),
-            new Ghost(GhostPersonality.Blinky)
+            new Ghost(GhostPersonality.Pinky),
+            new Ghost(GhostPersonality.Inky),
+            new Ghost(GhostPersonality.Clyde)
         };
-        
+
         SyncPacmanPosition();
-        
     }
     
     // ────────────────────── Input ─────────────────────────
@@ -61,6 +66,7 @@ public partial class GamePageViewModel : ObservableObject
             if (earned > 0)
             {
                 Score += earned;
+                Audio.PlayEatDot();
 
                 // Power pellet: assustar fantasmas
                 if (earned == 50)
@@ -68,6 +74,7 @@ public partial class GamePageViewModel : ObservableObject
                     _frightenedTicksLeft = FrightenedDuration;
                     foreach (var g in Ghosts)
                         g.SetFrightened();
+                    Audio.PlayFrightened();
                 }
             }
         }
@@ -77,9 +84,12 @@ public partial class GamePageViewModel : ObservableObject
         {
             _frightenedTicksLeft--;
             if (_frightenedTicksLeft == 0)
+            {
                 foreach (var g in Ghosts)
                     if (g.State == GhostState.Frightened)
                         g.SetChasing();
+                Audio.StopFrightened();
+            }
         }
 
         // 4) Mover fantasmas

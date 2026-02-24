@@ -71,6 +71,7 @@ public partial class App : Application
                 {
                     // TODO: Register your services
                     services.AddSingleton<IScoreService, ScoreService>();
+                    services.AddSingleton<IAudioService, AudioService>();
                     services.AddTransient<PacmanMenuViewModel>();
                     services.AddTransient<GamePageViewModel>();
                 })

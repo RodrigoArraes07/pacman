@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -26,4 +26,3 @@ public sealed partial class PacmanMenuPage : Page
         Console.WriteLine(DataContext == null ? "❌ DataContext NULL" : $"✅ DataContext OK: {DataContext}");
     }
 }
-
