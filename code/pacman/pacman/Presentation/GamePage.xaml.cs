@@ -188,6 +188,14 @@ public sealed partial class GamePage : Page
     {
         if (!_ghostImages.TryGetValue(ghost.Personality, out var img)) return;
 
+        if (ghost.State == GhostState.Returning)
+        {
+            img.Visibility = Visibility.Collapsed;
+            return;
+        }
+
+        img.Visibility = Visibility.Visible;
+
         if (ghost.State == GhostState.Frightened)
             img.Source = ViewModel.IsFrightenedWarning && _blinkToggle
                 ? _frightenedBitmap2

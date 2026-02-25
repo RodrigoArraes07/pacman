@@ -151,9 +151,7 @@ public class Ghost
             int nc = Col + dx;
             int nr = Row + dy;
 
-            bool walkable = State == GhostState.Returning
-                ? arena.IsWalkableForGhost(nc, nr)
-                : arena.IsWalkable(nc, nr);
+            bool walkable = arena.IsWalkableForGhost(nc, nr);
 
             if (!walkable) continue;
 
@@ -174,9 +172,7 @@ public class Ghost
             {
                 int nc = Col + dx;
                 int nr = Row + dy;
-                bool walkable = State == GhostState.Returning
-                    ? arena.IsWalkableForGhost(nc, nr)
-                    : arena.IsWalkable(nc, nr);
+                bool walkable = arena.IsWalkableForGhost(nc, nr);
                 if (!walkable) continue;
                 int dist = ManhattanDistance(nc, nr, targetCol, targetRow);
                 if (dist < bestDist) { bestDist = dist; bestDx = dx; bestDy = dy; }
@@ -186,9 +182,7 @@ public class Ghost
         int nextCol = Col + bestDx;
         int nextRow = Row + bestDy;
 
-        bool canMove = State == GhostState.Returning
-            ? arena.IsWalkableForGhost(nextCol, nextRow)
-            : arena.IsWalkable(nextCol, nextRow);
+        bool canMove = arena.IsWalkableForGhost(nextCol, nextRow);
 
         if (canMove)
         {

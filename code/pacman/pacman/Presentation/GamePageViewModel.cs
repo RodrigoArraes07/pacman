@@ -94,27 +94,25 @@ public partial class GamePageViewModel : ObservableObject
             }
         }
 
-        // 4) Mover fantasmas
-        foreach (var ghost in Ghosts)
-            ghost.Move(Arena, Pacman.Col, Pacman.Row);
-
-        // 5) Verificar colisão Pac-Man × Fantasmas
+        // 4) Verificar colisão Pac-Man × Fantasmas (antes do movimento)
         foreach (var ghost in Ghosts)
         {
             if (!ghost.IsAt(Pacman.Col, Pacman.Row)) continue;
 
             if (ghost.State == GhostState.Frightened)
             {
-                // Pac-Man comeu o fantasma
                 Score += 200;
                 ghost.SetReturning();
             }
             else if (ghost.State == GhostState.Chasing)
             {
-                // Pac-Man morreu
                 return TickResult.PacmanDied;
             }
         }
+
+        // 5) Mover fantasmas
+        foreach (var ghost in Ghosts)
+            ghost.Move(Arena, Pacman.Col, Pacman.Row);
 
         // 6) Verificar vitória
         if (Arena.IsCleared())
