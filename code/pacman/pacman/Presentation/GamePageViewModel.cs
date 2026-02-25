@@ -25,11 +25,13 @@ public partial class GamePageViewModel : ObservableObject
     private const int FrightenedDuration = 30; // ticks
 
     public IAudioService Audio { get; }
+    private readonly IScoreService _scoreService;
     public bool IsFrightenedWarning => _frightenedTicksLeft is > 0 and <= 10;
 
-    public GamePageViewModel(IAudioService audio)
+    public GamePageViewModel(IAudioService audio, IScoreService scoreService)
     {
         Audio = audio;
+        _scoreService = scoreService;
         Arena = new Arena();
         Pacman = new Pacman();
         Ghosts = new List<Ghost>
@@ -152,6 +154,22 @@ public partial class GamePageViewModel : ObservableObject
         SyncPacmanPosition();
     }
     
+    // ──────────────────────── Score Persistence ───────────────────
+    public async Task SaveScoreAsync(string playerName)
+    {
+        if (Score <= 0) return;
+
+        var name = string.IsNullOrWhiteSpace(playerName) ? "???" : playerName.Trim().ToUpper();
+        if (name.Length > 10) name = name[..10];
+
+        await _scoreService.SaveScoreAsync(new ScoreEntry
+        {
+            PlayerName = name,
+            Score = Score,
+            Date = DateTime.Now
+        });
+    }
+
     // ──────────────────────── Helpers ─────────────────────────────
     private void SyncPacmanPosition()
     {

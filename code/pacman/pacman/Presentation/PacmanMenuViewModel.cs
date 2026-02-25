@@ -24,9 +24,10 @@ public partial class PacmanMenuViewModel : ObservableObject
     }
 
     [RelayCommand]
-    private void ShowHighScores()
+    private async Task ShowHighScores()
     {
         _audio.PlayUiClick();
+        await _navigator.NavigateViewModelAsync<HighScoresViewModel>(this);
     }
 
     [RelayCommand]
