@@ -11,6 +11,10 @@
     mc:Ignorable="d"
     Background="Black">
 
+    <Page.Resources>
+        <local:SoundIconConverter x:Key="SoundIconConverter"/>
+    </Page.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="*" />

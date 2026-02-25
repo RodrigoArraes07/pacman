@@ -33,13 +33,16 @@ public partial class PacmanMenuViewModel : ObservableObject
     [RelayCommand]
     private void ToggleSound()
     {
-        _audio.PlayUiClick();
-        IsSoundEnabled = !IsSoundEnabled;
+        _audio.IsMuted = !_audio.IsMuted;
+        IsSoundEnabled = !_audio.IsMuted;
+        if (IsSoundEnabled)
+            _audio.PlayUiClick();
     }
 
     [RelayCommand]
     private void Exit()
     {
         _audio.PlayUiClick();
+        Environment.Exit(0);
     }
 }

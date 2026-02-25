@@ -17,6 +17,7 @@ public class AudioService : IAudioService
     private dynamic? _wmpWin;
     private dynamic? _wmpUiClick;
     private bool _wmpAvailable;
+    public bool IsMuted { get; set; }
 
     // ── Linux: processo persistente do loop de susto ───────────────────────────
     private Process? _frightenedProcess;
@@ -125,12 +126,14 @@ public class AudioService : IAudioService
     // ── Interface ──────────────────────────────────────────────────────────────
     public void PlayGameStart()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable) PlayWmp(_wmpGameStart!);
         else SpawnLinux("game_start.mp3");
     }
 
     public void PlayEatDot()
     {
+        if (IsMuted) return;
         _eatDotToggle = !_eatDotToggle;
         if (OperatingSystem.IsWindows() && _wmpAvailable)
             PlayWmp(_eatDotToggle ? _wmpEatDotA! : _wmpEatDotB!);
@@ -140,30 +143,35 @@ public class AudioService : IAudioService
 
     public void PlayLoseLife()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable) PlayWmp(_wmpLoseLife!);
         else SpawnLinux("lose_life.mp3");
     }
 
     public void PlayGameOver()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable) PlayWmp(_wmpGameOver!);
         else SpawnLinux("game_over.mp3");
     }
 
     public void PlayWin()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable) PlayWmp(_wmpWin!);
         else SpawnLinux("win.mp3");
     }
 
     public void PlayUiClick()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable) PlayWmp(_wmpUiClick!);
         else SpawnLinux("ui_click.mp3");
     }
 
     public void PlayFrightened()
     {
+        if (IsMuted) return;
         if (OperatingSystem.IsWindows() && _wmpAvailable)
         {
             try
