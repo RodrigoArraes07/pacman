@@ -177,7 +177,7 @@
         <Grid Grid.Row="1">
             <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="5">
                 <TextBlock
-                    Text="© 2026 Jala University / UNO PLATFORM V1.0.4"
+                    Text="Projeto de estudo / UNO PLATFORM V1.0.4"
                     FontSize="11"
                     Foreground="#666666"
                     HorizontalAlignment="Center" />

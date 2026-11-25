@@ -1,152 +1,155 @@
-# PACMAN
+# 🟡 Pac-Man em C# com Uno Platform
 
-`GAME PACMAN` | `START - JANUARY 29 2026`
+> Releitura do arcade clássico em C# / .NET 9: labirinto, quatro fantasmas com comportamentos distintos, power pellets, efeitos sonoros e ranking persistente — tudo em arquitetura MVVM.
 
-Implementação do clássico jogo Pac-Man desenvolvida com C# e Uno Platform.
+<!-- TODO: gravar um GIF da gameplay e salvar em docs/demo.gif -->
+![Demonstração](docs/demo.gif)
 
-This is a Jala University project to create a pacman game.
+## Sobre o projeto
 
-## Integrantes
+Projeto de estudo desenvolvido em equipe com o objetivo de praticar C#, a Uno Platform e o padrão MVVM construindo um jogo completo: da modelagem das regras ao áudio, à persistência de pontuações e à navegação entre telas.
 
-* Amaury Magno
-* Rodrigo Arraes
+O planejamento visual das telas está em [TEMPLATES.md](TEMPLATES.md).
 
----
+## Funcionalidades
 
-## Requisitos do Projeto
+- **Menu principal** com as opções Iniciar jogo, Pontuações, Som (liga/desliga) e Sair.
+- **Movimento contínuo** com as setas ou `W` `A` `S` `D`, com buffer de direção (a curva é feita assim que o caminho fica livre) e colisão com paredes.
+- **Labirinto 28×31** com pontos (10 pts) e 4 power pellets (50 pts).
+- **Quatro fantasmas com personalidades próprias:**
 
-### 1. Tela Inicial e Menu
-- Janela com título "PACMAN" e botões para iniciar jogo, ver quadro de pontuação e sair
-- Quadro de pontuação funcionando e salvando em arquivo (`.json`)
-- Botão para mutar/tocar música
+  | Fantasma | Alvo durante a perseguição |
+  |----------|----------------------------|
+  | Blinky (vermelho) | A posição atual do Pac-Man |
+  | Pinky (rosa) | 4 células à frente, na direção em que o próprio fantasma se move |
+  | Inky (ciano) | O ponto médio entre ele e o Pac-Man |
+  | Clyde (laranja) | O Pac-Man quando está longe (distância > 8); o canto inferior esquerdo quando está perto |
 
-### 2. Movimento do Pac-Man
-- Movimentação pelas teclas de seta
-- Tecla mantém o movimento contínuo (sem necessidade de segurar)
-- Colisão com paredes
-- Sons: comer pontos, movimentação, UI, vitória e derrota
+- **Modo assustado**: ao comer um power pellet, os fantasmas ficam vulneráveis por 30 ticks (~4,5 s) e piscam quando o efeito está acabando. Fantasma comido vale 200 pts e volta para a casa.
+- **3 vidas**, com sprite de morte e reposicionamento de personagens a cada vida perdida.
+- **Fim de jogo**: Game Over ao perder todas as vidas ou Vitória ao comer todos os pontos, com diálogo para registrar o nome (até 10 caracteres).
+- **Ranking persistente** em JSON, exibindo o top 10 com destaque para os três primeiros.
+- **Efeitos sonoros** para início de jogo, comer ponto, power pellet, perder vida, game over, vitória e cliques de interface.
+- `ESC` volta ao menu durante a partida.
 
-### 3. Tabuleiro
-- Mapa estático com Dots e Pills (4 power pellets)
-  - Dot concede pontos
-  - Pill permite consumir fantasmas por tempo limitado, com indicação visual do início e fim do efeito
-- Pontuação visível na tela, salva ao fim da partida
-
-### 4. Fantasmas
-- 4 fantasmas surgem no centro do mapa
-- Movimento aleatório ou em perseguição ao Pac-Man
-- Fantasma comido durante o efeito da Pill retorna ao centro para se resetar
-- Contato com fantasma sem efeito ativo subtrai uma vida (máximo 3 vidas)
-
-### 5. Fim de Jogo
-- **Game Over** ao perder todas as vidas — pop-up com opção de reiniciar
-- **Vitória** ao consumir todos os Dots
-
----
+<!-- TODO: o jogo tem uma única fase — o contador de nível fica em 1 e a vitória retorna ao menu. -->
 
 ## Tecnologias
 
-- **.NET 9.0** — runtime
-- **Uno Platform 6.4.58** — framework cross-platform (WinUI 3 / XAML)
-- **MVVM Community Toolkit** — padrão de apresentação
-- **Microsoft.Extensions.DependencyInjection** — injeção de dependência
-- **System.Text.Json** — persistência de pontuações
-
-## Estrutura do Projeto
-
-```
-pacman/
-├── Models/          # Lógica do jogo (Arena, Pacman, Ghost, ScoreEntry)
-├── Services/        # Serviços de negócio (ScoreService, AudioService)
-├── Presentation/    # Camada MVVM (Pages + ViewModels)
-├── Assets/
-│   ├── Sprites/     # Imagens do Pac-Man e fantasmas
-│   └── Sounds/      # Efeitos sonoros
-└── Platforms/       # Ponto de entrada por plataforma
-```
+| Tecnologia | Uso |
+|------------|-----|
+| C# / .NET 9 (`net9.0-desktop`) | Linguagem e runtime |
+| Uno Platform 6.4.58 (Uno.Sdk) | UI multiplataforma em XAML (WinUI), renderizador Skia |
+| CommunityToolkit.Mvvm | `ObservableObject`, `[ObservableProperty]`, `[RelayCommand]` |
+| Uno.Extensions (Hosting, Navigation, Configuration, Logging) | Injeção de dependência, navegação por rotas, configuração e logs |
+| Uno Material / Toolkit | Tema e componentes visuais |
+| System.Text.Json | Persistência do ranking |
+| Windows Media Player (COM) / ffplay · mpg123 | Reprodução de áudio no Windows / Linux |
 
 ## Arquitetura
 
-O projeto segue o padrão **Models → Services → Presentation (MVVM)**:
+O código segue **MVVM** em três camadas:
 
-- **Models** — encapsulam a lógica pura do jogo, sem dependência de UI
-- **Services** — gerenciam persistência de pontuações e reprodução de áudio
-- **ViewModels** — expõem estado observável e comandos para as Views
-- **Pages (Views)** — renderizam o jogo em canvas e gerenciam input do teclado
+- **Models** — regras do jogo puras, sem dependência de UI: labirinto e pontos (`Arena`), movimento do jogador (`Pacman`) e máquina de estados + IA dos fantasmas (`Ghost`).
+- **Services** — persistência do ranking (`ScoreService`) e áudio multiplataforma (`AudioService`), expostos por interfaces e registrados na injeção de dependência.
+- **Presentation** — ViewModels com estado observável e comandos; a `GamePage` desenha o jogo em um `Canvas` e, a cada tick de 150 ms, chama `GamePageViewModel.ProcessTick()`, que move o Pac-Man, contabiliza pontos, atualiza o modo assustado, verifica colisões, move os fantasmas e checa a vitória.
 
-## Funcionamento do Jogo
+```mermaid
+classDiagram
+    direction LR
+    class App {
+        +ConfigureServices()
+        +RegisterRoutes()
+    }
+    class PacmanMenuViewModel
+    class GamePageViewModel {
+        +ProcessTick() TickResult
+        +SaveScoreAsync(name)
+    }
+    class HighScoresViewModel {
+        +LoadScoresAsync()
+    }
+    class Arena {
+        +IsWalkable(col,row)
+        +EatDot(col,row) int
+        +IsCleared() bool
+    }
+    class Pacman {
+        +SetDirection(dx,dy)
+        +Move(arena) bool
+    }
+    class Ghost {
+        +GhostPersonality Personality
+        +GhostState State
+        +Move(arena, col, row)
+    }
+    class IScoreService {
+        <<interface>>
+    }
+    class IAudioService {
+        <<interface>>
+    }
+    class ScoreService
+    class AudioService
 
-### Loop Principal (150ms por tick)
+    App ..> PacmanMenuViewModel : rota Menu
+    App ..> GamePageViewModel : rota Game
+    App ..> HighScoresViewModel : rota HighScores
+    GamePageViewModel --> Arena
+    GamePageViewModel --> Pacman
+    GamePageViewModel --> "4" Ghost
+    GamePageViewModel --> IScoreService
+    GamePageViewModel --> IAudioService
+    HighScoresViewModel --> IScoreService
+    PacmanMenuViewModel --> IAudioService
+    IScoreService <|.. ScoreService
+    IAudioService <|.. AudioService
+```
 
-1. **Mover Pac-Man** — aplica direção com buffer de input para controles responsivos
-2. **Comer pontos** — detecta ponto ou power pellet na posição atual
-3. **Estado Frightened** — power pellet ativa por 30 ticks; fantasmas ficam vulneráveis
-4. **Mover fantasmas** — cada fantasma age conforme seu estado e personalidade
-5. **Detectar colisão** — Pac-Man come fantasma assustado ou perde vida
-6. **Verificar vitória** — fase concluída ao comer todos os pontos
+```
+code/pacman/pacman/
+├── Models/          # Arena, Pacman, Ghost, ScoreEntry
+├── Services/        # ScoreService, AudioService (+ interfaces)
+├── Presentation/    # Pages (XAML) + ViewModels
+├── Assets/          # Sprites e sons
+└── Platforms/       # Ponto de entrada desktop
+```
 
-### Pontuação
+## Como executar
 
-| Evento | Pontos |
-|--------|--------|
-| Ponto pequeno | 10 |
-| Power pellet | 50 |
-| Fantasma comido | 200 |
-
-### Vidas
-
-- Início com **3 vidas**
-- Perda de vida ao tocar fantasma perseguindo
-- **Game Over** ao zerar vidas
-- Posições reiniciam ao perder vida; labirinto e pontuação são preservados
-
-### IA dos Fantasmas
-
-Cada fantasma possui uma personalidade com comportamento distinto:
-
-| Fantasma | Cor | Comportamento |
-|----------|-----|---------------|
-| **Blinky** | Vermelho | Perseguição direta ao Pac-Man |
-| **Pinky** | Rosa | Antecipa 4 células à frente do Pac-Man |
-| **Inky** | Ciano | Combinação entre posição atual e Pac-Man |
-| **Clyde** | Laranja | Persegue quando longe, dispersa quando perto |
-
-Estados dos fantasmas: **Chasing → Frightened → Returning** (para casa após ser comido).
-
-### Navegação
-
-- **Menu Principal** → Iniciar jogo / Ver recordes / Som / Sair
-- **Gameplay** → HUD com pontuação, nível e vidas
-- **Fim de jogo / Vitória** → Salva pontuação com nome do jogador
-- **Recordes** → Top 10, com destaque para os 3 primeiros
-
-## Controles
-
-| Tecla | Ação |
-|-------|------|
-| `↑ ↓ ← →` | Mover Pac-Man |
-| `ESC` | Voltar ao menu |
-
-## Como Executar
-
-Requisitos: .NET 9.0 SDK instalado.
+**Pré-requisito:** [.NET 9 SDK](https://dotnet.microsoft.com/download/dotnet/9.0). <!-- TODO: confirmar se o workload/ferramentas do Uno (uno-check) são necessários em uma máquina limpa -->
 
 ```bash
-# Restaurar dependências
-dotnet restore
-
-# Executar o projeto
+git clone https://github.com/RodrigoArraes07/pacman.git
+cd pacman
 dotnet run --project code/pacman/pacman/pacman.csproj
 ```
 
-## Persistência
+Também é possível abrir `code/pacman/pacman.sln` no Visual Studio ou no Rider e executar o perfil **pacman (Desktop)**.
 
-Pontuações salvas em JSON no diretório de dados da aplicação:
-`ApplicationData/LocalFolder/scores.json`
+**Áudio:** no Windows é usado o Windows Media Player (COM); no Linux é necessário ter `ffplay` (FFmpeg) ou `mpg123` instalado.
 
-## Áudio
+<!-- TODO: confirmar execução em Linux e macOS (o host está configurado para X11, FrameBuffer, macOS e Win32, mas só o Windows foi verificado) -->
 
-Efeitos sonoros para: início de jogo, comer ponto, perder vida, game over, vitória, power pellet e cliques de UI.
+O ranking é salvo em `scores.json`, na pasta local de dados do aplicativo.
 
-- **Windows** — Windows Media Player (COM)
-- **Linux** — FFplay / MPG123
+## Testes
+
+O projeto ainda não possui testes automatizados.
+
+## Minha contribuição
+
+- **Implementei** o `ScoreService` e o modelo `ScoreEntry`, com persistência do ranking em JSON e registro na injeção de dependência.
+- **Construí** a tela de recordes (`HighScoresPage` + `HighScoresViewModel`), com top 10 e destaque para os três primeiros, e o diálogo de nome que salva a pontuação ao fim da partida.
+- **Desenvolvi** o `AudioService` multiplataforma (Windows via COM, Linux via ffplay/mpg123) com 7 efeitos sonoros e música em loop no modo assustado.
+- **Substituí** as formas geométricas por sprites do Pac-Man (com rotação por direção) e dos fantasmas, incluindo sprite de morte e efeito de piscar no fim do modo assustado.
+- **Ajustei** as personalidades dos fantasmas e **corrigi** a saída da casa, a ordem de detecção de colisão e o retorno do fantasma comido.
+- **Implementei** o controle de mute com troca de ícone (`SoundIconConverter`) e o botão de sair.
+- **Documentei** o planejamento visual das telas (`TEMPLATES.md`) e o README do projeto.
+
+## Equipe
+
+- Amaury Magno
+- Rodrigo Arraes
+
+<!-- TODO: adicionar licença, se desejado -->
